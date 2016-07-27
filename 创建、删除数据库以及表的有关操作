@@ -1,0 +1,160 @@
+创建数据库  ：                 create database school;
+显示所有数据库：           show databases;
+删除数据库：                   drop database school;
+查询MYSQL数据库的默认存储引擎： show engines \G
+                                show variables like "storage_engine";
+查看表的结构 ： describe 表名 /  desc 表名
+################################################ ###################
+                                               主键
+*****主键 primary key
+   主键是 表的一个特殊字段，它能唯一标识该表中的每条信息。
+   主键跟记录是一 一对应的，每个记录的主键值不同
+   设置表的主键是指在创建表时，设置表的某个字段为该表的主键
+*****
+   设置主键的目的是帮助MYSQL以最快的速度查询表的某一条信息。
+  主键必须满足的条件：
+                                     主键必须是唯一的
+                                     任意两条记录的主键字段的值不能相同
+                                     主键的值是非空值
+主键可以是单一字段主键和多字段主键：
+                    单字段主键：create table example(stu_id int primary key,
+                                                                             stu_name varchar(20),
+                                                                              stu_sex boolean);
+                   多字段主键：create table example(stu_id int,
+                                                                             stu_name vachar(20),
+                                                                             stu_id boolean,
+                                                                             primary key(stu_id,stu_name));
+##########################################################################
+                                                外键
+外键是foreign key,外键是表的特殊字段，如果字段sno是一个表A的属性，并且依赖于表B的主键，则称表B为父表，
+表A是子表，sno为表A的外键，通过sno字段将父表B和子表A建立关联。
+外键不能重命名
+创建表的外键是指在创建表时，设置某一字段为外键。
+设置外键的原则：必须依赖数据库中已存在的父表，外键可以为空值。
+外键使父表和子表之间建立关系，父表中删除某条信息，子表中与其对应的信息也必须有相应的改变。
+创建外键的语句：
+  mysql> show tables;
++-------------------+
+| Tables_in_example |
++-------------------+
+| example0          |
+| example1          |
+| example2          |
++-------------------+
+3 rows in set (0.00 sec)
+
+mysql> describe example2;
++-----------+---------+------+-----+---------+-------+
+| Field     | Type    | Null | Key | Default | Extra |
++-----------+---------+------+-----+---------+-------+
+| stu_id    | int(11) | NO   | PRI | NULL    |       |
+| course_id | int(11) | NO   | PRI | NULL    |       |
+| grade_id  | int(11) | YES  |     | NULL    |       |
++-----------+---------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+mysql> create table example3( id int primary key, stu_id int, course_id int, constraint dd foreign key(stu_id,course_id) references example2(stu_id,course_id) );
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_example |
++-------------------+
+| example0          |
+| example1          |
+| example2          |
+| example3          |
++-------------------+
+4 rows in set (0.00 sec)
+
+mysql> desc example3;
++-----------+---------+------+-----+---------+-------+
+| Field     | Type    | Null | Key | Default | Extra |
++-----------+---------+------+-----+---------+-------+
+| id        | int(11) | NO   | PRI | NULL    |       |
+| stu_id    | int(11) | YES  | MUL | NULL    |       |
+| course_id | int(11) | YES  |     | NULL    |       |
++-----------+---------+------+-----+---------+-------+
+3 rows in set (0.07 sec)
+########################################################################
+                              表的非空约束
+非空性是指表的字段的值不能为空值。
+非空约束保证所有记录中，该字段的值不为空，都有值
+如果用户插入的新记录中，该字段的值为空值，则数据库系统会报错，该条记录将不能插入
+设置表的非空约束是指在创建表时为某特殊字段加上NOT NULL约束条件
+设置非空约束的基本语法规则：
+     属性名   数据类型  NOT NULL
+#######################################################################
+                           表的唯一性约束
+唯一性是指所有记录中该字段的值不能重复出现
+设置表的唯一性约束是指在创建表时为表的某些字段加上UNIQUE约束条件。
+唯一性约束将保证所有记录中该字段的值不会重复出现
+比如：在表的id字段加上唯一性约束条件，每条记录的id值都会是唯一的，不可能出现重复情况。
+设置唯一性约束的基本语法是：
+  属性名  数据类型  UNIQUE
+mysql> use example;
+Database changed
+mysql> create table example5(
+    -> id int primary key,
+    -> stu_id int unique,
+    -> name varchar(20) not null
+    -> );
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_example |
++-------------------+
+| example0          |
+| example1          |
+| example2          |
+| example3          |
+| example4          |
+| example5          |
++-------------------+
+6 rows in set (0.00 sec)
+
+mysql> desc example5;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| stu_id | int(11)     | YES  | UNI | NULL    |       |
+| name   | varchar(20) | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+3 rows in set (0.06 sec)
+##############################################################################
+                          设置表的属性值自动加1
+auto_increment 是MYsql数据库中一个特殊的约束条件
+其主要用于为表中插入的新记录自动生成唯一的ID，且该字段必须必须为主键的一部分，
+auto_increment约束的字段可以为任意整数类型（tinyint,smallint,mediumint,int,bigint）,
+该字段的值是从1开始自增。
+设置自增属性的语法：
+属性名  数据类型  auto_increment
+#############################################################################
+                  设置表的属性的默认值
+在创建表时，可以指定表中字段的默认值，如果插入一条新的记录时，没有为该字段赋值 ，数据库系统会自动为该字段插入默认值
+设置表的默认值的基本语法规则：
+   属性名 数据类型 default 默认值
+#############################################################################
+                 查看表结构
+查看表结构是指查看数据表中已存在的表的定义，包括：describe  ,   show create table 
+通过上述两个语句可以查看 表的字段名、字段数据类型、完整性约束条件
+describe  表名 ；     可以查看字段名，字段数据类型，是否为主键和默认值等
+show  create table  表名;   可以 查看表的详细结构，如：查看表的字段名，字段数据类型，是否为主键和默认                                               值等，最主要的是可以查看表默认的存储引擎和字符编码
+mysql> show create table example7\G
+*************************** 1. row ***************************              \G代替； 可以使表整齐的展现出来
+       Table: example7
+Create Table: CREATE TABLE `example7` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `stu_id` int(11) DEFAULT NULL,
+  `stu_name` varchar(20) NOT NULL,
+  `english` varchar(20) DEFAULT 'zero',
+  `math` float DEFAULT '0',
+  `computer` float DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `stu_id` (`stu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.00 sec)
+
+
+   
