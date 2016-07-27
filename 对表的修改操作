@@ -1,0 +1,154 @@
+修改表是指修改数据库中已存在的表的定义
+修改表比重新定义表简单，不需要重新加载数据，也不影响正在进行的服务
+修改表包括修改表名，修改字段数据类型，修改字段名，增加字段，删除字段，修改字段的排列位置，更改默认存储引擎，删除表的外键约束
+1.修改表名
+   表名可以在数据库中唯一的确定一张表，数据库系统通过表名来区分不同的表
+   alter table 旧表名 rename 新表名；
+2. 修改字段的数据类型
+   字段的数据类型包括整型，浮点型，字符串类型，二进制类型，日期和时间类型
+   数据类型决定了数据的存储格式，约束条件，有效范围
+   表中每个字段都有数据类型
+   alter table 表名 modify 属性名  数据类型；
+3. 修改字段名                    有可能会造成约束条件的丢失，所以最后面加上约束条件
+     字段名可以在一张表中 唯一的确定一个字段，数据库中 可以通过字段名来区分表中不同的字段  
+    alter table 表名  change   旧属性名    新属性名 新数据类型
+     ****修改字段名
+     ****修改字段名和字段类型
+4.增加字段
+  在创建表时，字段的定义就已经完成
+  alter table 表名  add  属性名1 数据类型【完整性约束条件】 【first | after 属性名2】
+   默认情况下，是在表的最后增加新的字段                                第一个     属性名2之后
+举例
+ ***增加无约束条件的字段
+    alter table user  add  phone varchar(20);       默认将字段增加在最后
+***增加有约束条件的字段
+   alter  table user add  address varchar(30) not null;
+***在表的第一个位置增加字段
+   alter  table user add  num  int(8) primary key first;
+***在指定位置之后增加表的字段
+   alter table user add age int(4) after name;
+5.删除字段
+   alter table user  drop  字段名；
+
+mysql> alter table user add phone varchar(20);  增加无完整性约束的字段
+Query OK, 0 rows affected (0.17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> show tables;
++-------------------+
+| Tables_in_example |
++-------------------+
+| example1          |
+| example2          |
+| example3          |
+| example4          |
+| example5          |
+| example6          |
+| example7          |
+| user              |
++-------------------+
+8 rows in set (0.00 sec)
+
+mysql> desc user;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| id    | int(11)     | YES  |     | NULL    |       |
+| name  | varchar(30) | YES  |     | NULL    |       |
+| sex   | tinyint(1)  | YES  |     | NULL    |       |
+| phone | varchar(20) | YES  |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+4 rows in set (0.02 sec)
+
+mysql> alter table user add address varchar(30) not null;  增加具有完整性约束的字段
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc user;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| id      | int(11)     | YES  |     | NULL    |       |
+| name    | varchar(30) | YES  |     | NULL    |       |
+| sex     | tinyint(1)  | YES  |     | NULL    |       |
+| phone   | varchar(20) | YES  |     | NULL    |       |
+| address | varchar(30) | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> alter table user add num int(8) primary key first;  在表中第一个位置增加字段
+Query OK, 0 rows affected (0.15 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc user;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| num     | int(8)      | NO   | PRI | NULL    |       |
+| id      | int(11)     | YES  |     | NULL    |       |
+| name    | varchar(30) | YES  |     | NULL    |       |
+| sex     | tinyint(1)  | YES  |     | NULL    |       |
+| phone   | varchar(20) | YES  |     | NULL    |       |
+| address | varchar(30) | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> alter table user add age int(4) after sex;    在指定位置之后增加字段
+Query OK, 0 rows affected (0.15 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc tables;
+ERROR 1146 (42S02): Table 'example.tables' doesn't exist
+mysql> desc user;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| num     | int(8)      | NO   | PRI | NULL    |       |
+| id      | int(11)     | YES  |     | NULL    |       |
+| name    | varchar(30) | YES  |     | NULL    |       |
+| sex     | tinyint(1)  | YES  |     | NULL    |       |
+| age     | int(4)      | YES  |     | NULL    |       |
+| phone   | varchar(20) | YES  |     | NULL    |       |
+| address | varchar(30) | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+7 rows in set (0.05 sec)
+
+mysql> alter table user drop age;     删除某字段
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> describe user;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| num     | int(8)      | NO   | PRI | NULL    |       |
+| id      | int(11)     | YES  |     | NULL    |       |
+| name    | varchar(30) | YES  |     | NULL    |       |
+| sex     | tinyint(1)  | YES  |     | NULL    |       |
+| phone   | varchar(20) | YES  |     | NULL    |       |
+| address | varchar(30) | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+6.修改字段的位置
+  alter table  表名 modify 属性名1 属性数据类型 【 first |after 属性名2】
+  将字段1放到表的最前面，或者放在字段2的后面
+7.删除外键
+alter table worker drop foreign key worker_dd;
+alter table 表名 drop foreign key 外键名；
+8 删除一个父表时，因为父表和子表通过外键连接，所以不能删除，除非子表删除了外键，或者子表先于父表删       除
+9 如何设置外键
+   子表的某一字段，依赖父表的某一字段，所以父表应该先于子表建立，父表中与子表建立外键的字段必须是主键或者组合主键的一部分
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
